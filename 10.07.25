@@ -1,0 +1,216 @@
+/*----------------------------------------------------------------------------*/
+/*                                                                            */
+/*    Module:       main.cpp                                                  */
+/*    Author:       lapto                                                     */
+/*    Created:      5/28/2024, 6:39:08 PM                                     */
+/*    Description:  V5 project                                                */
+/*                                                                            */
+/*----------------------------------------------------------------------------*/
+#include "vex.h"
+
+using namespace vex;
+
+// A global instance of vex::brain used for printing to the V5 brain screen
+vex::brain       Brain;
+motor m1 = motor(PORT3,ratio18_1,false);
+motor m2 = motor(PORT20,ratio18_1,true);
+
+// motor leftfrontmotor = motor(PORT1, ratio18_1, false);
+// // motor leftbackmotor = motor(PORT2, ratio18_1, false);
+// // motor lefttopmotor = motor(PORT3, ratio18_1, false);
+// motor rightfrontmotor = motor(PORT7, ratio18_1, true);
+// // motor rightbackmotor = motor(PORT9, ratio18_1, true);
+// // motor righttopmotor = motor(PORT10, ratio18_1, true);
+// // motor intake = motor(PORT21, ratio18_1, false);
+// // motor arm = motor(PORT4, ratio18_1, false);
+// // digital_out pneum = digital_out(Brain.ThreeWirePort.A);
+// // digital_out pneum2 = digital_out(Brain.ThreeWirePort.B);
+// inertial inert = inertial(PORT8);
+// controller control = controller();
+// bool mobogo = false;
+// bool intakeRun = false;
+// bool armDown = false;
+// define your global instances of motors and other devices here
+
+
+
+// void move(){
+//     while(true){
+//         int forward_power = 0;
+//         int turn_power = 0;
+//         if (control.Axis3.position() > 10 || control.Axis3.position() < -10) {
+//             forward_power = control.Axis3.position();
+//         }
+//         if (control.Axis1.position() > 10 || control.Axis1.position() < -10) {
+//             turn_power = control.Axis1.position();
+//         }
+//         leftfrontmotor.spin(forward, forward_power + turn_power, pct);
+//         // leftbackmotor.spin(reverse, forward_power + turn_power, pct);
+//         // lefttopmotor.spin(reverse, forward_power + turn_power, pct);
+//         rightfrontmotor.spin(forward, forward_power - turn_power, pct);
+//         // rightbackmotor.spin(reverse, forward_power - turn_power, pct);
+//         // righttopmotor.spin(reverse, forward_power - turn_power, pct);
+//     }
+// }
+
+// void runMOBOGO() {
+//     if (!mobogo) {
+//         pneum.set(true);
+//     } else {
+//         pneum.set(false);
+//     }
+//     mobogo = !mobogo;
+// }
+
+// void runArm() {
+//     if (!armDown) {
+//         pneum2.set(true);
+//     } else {
+//         pneum2.set(false);
+//     }
+//     armDown = !armDown;
+// }
+
+// void runIntake() {
+//     if (!intakeRun) {
+//         intake.spin(forward, 100, percent);
+//     } else {
+//         intake.stop();
+//     }
+//     intakeRun = !intakeRun;
+// }
+
+// void reverseIntake() {
+//     if (!intakeRun) {
+//         intake.spin(reverse, 100, percent);
+//     } else {
+//         intake.stop();
+//     }
+//     intakeRun = !intakeRun;
+// }
+// void move3(){
+//     while(true){
+//     if(control.ButtonL1.pressing()){
+//             intake.spin(forward, 100, percent);
+//         }
+//     else if(control.ButtonL2.pressing()){
+//             intake.stop();
+//         }
+//     }
+// }
+
+void move4(){
+    while(true){
+        m1.spin(forward, 100, percent);
+    }
+}
+
+void move5(){
+    while(true){
+        m2.spin(forward, 100, percent);
+    }
+}
+
+int main() {
+    // thread thrd(move3);
+    thread thrd(move4);
+
+    thread thrdd(move5);
+
+    // control.ButtonL1.released(runIntake);
+    // control.ButtonL2.released(reverseIntake);
+    // control.ButtonR1.released(runMOBOGO);
+    // control.ButtonR2.released(runArm);
+    // thread thread(move);
+} 
+
+
+// /*----------------------------------------------------------------------------*/
+// /*                                                                            */
+// /*    Module:       main.cpp                                                  */
+// /*    Author:       lapto                                                     */
+// /*    Created:      5/28/2024, 6:39:08 PM                                     */
+// /*    Description:  V5 project                                                */
+// /*                                                                            */
+// /*----------------------------------------------------------------------------*/
+// #include "vex.h"
+
+// using namespace vex;
+
+// // A global instance of vex::brain used for printing to the V5 brain screen
+// vex::brain       Brain;
+// motor leftfrontmotor = motor(PORT8, ratio18_1, false);
+// motor leftbackmotor = motor(PORT7, ratio18_1, false);
+// motor lefttopmotor = motor(PORT6, ratio18_1, true);
+// motor rightfrontmotor = motor(PORT3, ratio18_1, true);
+// motor rightbackmotor = motor(PORT2, ratio18_1, true);
+// motor righttopmotor = motor(PORT1, ratio18_1, false);
+// motor intake = motor(PORT20, ratio18_1, false);
+// motor arm = motor(PORT4, ratio18_1, false);
+// digital_out pneum = digital_out(Brain.ThreeWirePort.A);
+// inertial inert = inertial(PORT19);
+// controller control = controller();
+// // define your global instances of motors and other devices here
+
+
+
+// void move(){
+//     while(true){
+//         int forward_power = control.Axis3.position();
+//         if (control.Axis3.position() > 90 & control.Axis1.position() > -10 && control.Axis1.position() < 10){
+//             forward_power = 100;
+//         }
+//         int turn_power = control.Axis1.position();
+//         if(control.Axis1.position() > 90 & control.Axis3.position() > -10 && control.Axis3.position() < 10){
+//             turn_power = 100;
+//         }
+//         if (control.Axis3.position() < -90 & control.Axis1.position() > -10 & control.Axis1.position() < 10){
+//             forward_power = -100;
+//         }
+//         if (control.Axis1.position() < -90 & control.Axis3.position() > -10 & control.Axis3.position() < 10){
+//             turn_power = -100;
+//         }
+//         leftfrontmotor.spin(reverse, forward_power + turn_power, pct);
+//         leftbackmotor.spin(reverse, forward_power + turn_power, pct);
+//         lefttopmotor.spin(reverse, forward_power + turn_power, pct);
+//         rightfrontmotor.spin(reverse, forward_power - turn_power, pct);
+//         rightbackmotor.spin(reverse, forward_power - turn_power, pct);
+//         righttopmotor.spin(reverse, forward_power - turn_power, pct);
+//     }
+// }
+// void move2(){
+//     while(true){
+//         if(control.ButtonR1.pressing()){
+//             pneum.set(true);
+//         }
+//         else if(control.ButtonR2.pressing()){
+//             pneum.set(false);
+//         }
+//     }
+// }
+
+// void move3(){
+//     while(true){
+//     if(control.ButtonL1.pressing()){
+//             intake.spin(forward, 100, percent);
+//         }
+//     else if(control.ButtonL2.pressing()){
+//             intake.stop();
+//         }
+//     }
+// }
+
+// int main() {
+//     thread thrd(move2);
+//     thread threadd(move3);
+//     while(true){
+//         move();
+//     }
+// } 
+
+
+
+
+
+
+
