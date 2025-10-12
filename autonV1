@@ -1,0 +1,199 @@
+/*----------------------------------------------------------------------------*/
+/*                                                                            */
+/*    Module:       main.cpp                                                  */
+/*    Author:       lapto                                                     */
+/*    Created:      5/9/2024, 6:22:49 PM                                      */
+/*    Description:  V5 project                                                */
+/*                                                                            */
+/*----------------------------------------------------------------------------*/
+#include "vex.h";
+
+using namespace vex;
+
+// A global instance of vex::brain used for printing to the V5 brain screen
+vex::brain       Brain;
+motor leftfrontmotor = motor(PORT2, ratio18_1, false);
+motor leftbackmotor = motor(PORT11, ratio18_1, false);
+motor leftmidmotor = motor(PORT1, ratio18_1, false);
+motor rightfrontmotor = motor(PORT7, ratio18_1, true);
+motor rightbackmotor = motor(PORT20, ratio18_1, true);
+motor rightmidmotor = motor(PORT8, ratio18_1, true);
+motor frontrollers = motor(PORT9, ratio18_1, false);
+motor backrollers = motor(PORT19, ratio18_1, false);
+// digital_out pneum = digital_out(Brain.ThreeWirePort.A);
+// digital_out pneum2 = digital_out(Brain.ThreeWirePort.B);
+inertial inert = inertial(PORT15);
+
+
+controller control = controller();
+// define your global instances of motors and other devices here
+
+void turnRight(int units){
+    inert.resetRotation();
+    float lasterror = -units;
+    float placeholder = 0;
+    while(true){
+        float error = -units + inert.rotation(degrees);
+        float derivative = error - lasterror;
+        float power = error*0.5 + derivative*0.5;
+        if(error < 0){
+            placeholder = error*-1;
+        }
+        else{
+            placeholder = error;
+        }
+        if (placeholder < 3){
+            break;
+        }
+        leftfrontmotor.spin(forward, power, pct);
+        leftbackmotor.spin(forward, power, pct);
+        rightfrontmotor.spin(reverse, power, pct);
+        rightbackmotor.spin(reverse, power, pct);
+        lasterror = error;
+        wait(10, msec);
+    }
+    leftfrontmotor.stop();
+    leftbackmotor.stop();
+    rightfrontmotor.stop();
+    rightbackmotor.stop();
+}
+
+void turnLeft(int units){
+    inert.resetRotation();
+    float lasterror = -units;
+    float asdfgh = 0;
+    while(true){
+        float error = -units - inert.rotation(degrees);
+        float derivative = error - lasterror;
+        float power = error*0.3 + derivative*0.5;
+        if(error < 0){
+            asdfgh = error*-1;
+        }
+        else{
+            asdfgh = error;
+        }
+        if (asdfgh < 4){
+            break;
+        }
+        leftfrontmotor.spin(reverse, power, pct);
+        leftbackmotor.spin(reverse, power, pct);
+        rightfrontmotor.spin(forward, power, pct);
+        rightbackmotor.spin(forward, power, pct);
+        lasterror = error;
+        wait(10, msec);
+    }
+    leftfrontmotor.stop();
+    leftbackmotor.stop();
+    rightfrontmotor.stop();
+    rightbackmotor.stop();
+}
+
+
+int driveForward(int units){
+    Brain.Screen.setCursor(1,1);
+    Brain.Screen.clearScreen();
+    float lasterror = units;
+    float asdfgh = 0;
+    while(true){
+        float error = units - leftfrontmotor.position(degrees);
+        float derivative = error - lasterror;
+        float power = error*0.15 + derivative*0.12;
+        if(error < 0){
+            asdfgh = error*-1;
+        }
+        else{
+            asdfgh = error;
+        }
+        if (asdfgh < 10){
+            break;
+        }
+        // leftfrontmotor.spin(forward, power, pct);
+        leftmidmotor.spin(forward, power, pct);
+        leftbackmotor.spin(forward, power, pct);
+        // rightfrontmotor.spin(forward, power, pct);
+        rightmidmotor.spin(forward, power, pct);
+        rightbackmotor.spin(forward, power, pct);
+        lasterror = error;
+        wait(10, msec);
+    }
+    leftbackmotor.stop();
+    leftfrontmotor.stop();
+    leftmidmotor.stop();
+    rightfrontmotor.stop();
+     rightfrontmotor.stop();
+    rightmidmotor.stop();
+    return  0;
+}
+
+void driveReverse(int units){
+    leftfrontmotor.resetPosition();
+    float lasterror = units;
+    float asdfgh = 0;
+    while(true){
+        float error = units + leftfrontmotor.position(degrees);
+        float derivative = error - lasterror;
+        float power = error*0.2 + derivative*0.15;
+        if(error < 0){
+            asdfgh = error*-1;
+        }
+        else{
+            asdfgh = error;
+        }
+        if (asdfgh < 10){
+            break;
+        }
+        // leftfrontmotor.spin(reverse, power, pct);
+        leftmidmotor.spin(reverse, power, pct);
+        leftbackmotor.spin(reverse, power, pct);
+        // rightfrontmotor.spin(reverse, power, pct);
+        rightmidmotor.spin(reverse, power, pct);
+        rightbackmotor.spin(reverse, power, pct);
+        lasterror = error;
+        wait(10, msec);
+    }
+    leftbackmotor.stop();
+    leftfrontmotor.stop();
+    leftmidmotor.stop();
+    rightfrontmotor.stop();
+     rightfrontmotor.stop();
+    rightmidmotor.stop();
+    // turnLeft(1);
+}
+
+void badturnLeft(int units){
+    leftmidmotor.spin(reverse, 100, percent);
+    leftmidmotor.spin(reverse, 100, percent);
+    leftmidmotor.spin(reverse, 100, percent);
+    wait(units, seconds);
+}
+
+int brainDisplay(void){
+    while(true){
+        Brain.Screen.clearScreen();
+        Brain.Screen.setCursor(1,1); //row-column yx
+        Brain.Screen.print("Inertial Reading: %f", inert.rotation(degrees));
+        wait(10,msec);
+    }
+    return(0);
+}
+
+
+void calibrate(){
+    inert.calibrate();
+    wait(3, seconds);
+}
+
+
+int main() {
+    thread thrd(brainDisplay);
+    calibrate();
+    driveReverse(190);
+    turnRight(39);
+    driveReverse(1200);
+    turnRight(20);
+    driveReverse(800);
+
+
+
+
+}
