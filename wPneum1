@@ -1,0 +1,134 @@
+/*----------------------------------------------------------------------------*/
+/*                                                                            */
+/*    Module:       main.cpp                                                  */
+/*    Author:       lapto                                                     */
+/*    Created:      5/28/2024, 6:39:08 PM                                     */
+/*    Description:  V5 project                                                */
+/*                                                                            */
+/*----------------------------------------------------------------------------*/
+#include "vex.h"
+
+using namespace vex;
+
+// A global instance of vex::brain used for printing to the V5 brain screen
+vex::brain       Brain;
+motor leftfrontmotor = motor(PORT4, ratio18_1, true);
+motor leftbackmotor = motor(PORT11, ratio18_1, true);
+motor leftmidmotor = motor(PORT3, ratio18_1, true);
+motor rightfrontmotor = motor(PORT8, ratio18_1, false);
+motor rightbackmotor = motor(PORT20, ratio18_1, false);
+motor rightmidmotor = motor(PORT6, ratio18_1, false);
+motor frontrollers = motor(PORT21, ratio18_1, false);
+motor backrollers = motor(PORT19, ratio18_1, false);
+digital_out pneum = digital_out(Brain.ThreeWirePort.A);
+// digital_out pneum2 = digital_out(Brain.ThreeWirePort.B);
+inertial inert = inertial(PORT15);
+controller control = controller();
+bool platform = false;
+bool backRollersRun = false;
+bool frontRollersRun = false;
+
+
+void move() {
+    while (true) {
+        int forward_power = 0;
+        int turn_power = 0;
+        if (control.Axis3.position() > 10 || control.Axis3.position() < -10) {
+            forward_power = control.Axis3.position();
+        }
+
+        if (control.Axis1.position() > 10 || control.Axis1.position() < -10) {
+            turn_power = control.Axis1.position();
+        }
+
+        leftfrontmotor.spin(forward, forward_power + turn_power, pct);
+        leftbackmotor.spin(forward, forward_power + turn_power, pct);
+        leftmidmotor.spin(forward, forward_power + turn_power, pct);
+        rightfrontmotor.spin(forward, forward_power - turn_power, pct);
+        rightbackmotor.spin(forward, forward_power - turn_power, pct);
+        rightmidmotor.spin(forward, forward_power - turn_power, pct);
+        wait(0.05, seconds);
+    }
+}
+
+void length() {
+    if (!platform) {
+        pneum.set(true);
+    } else {
+        pneum.set(false);
+    }
+    platform = !platform;
+}
+
+void runFrontRollers() {
+    if (!frontRollersRun) {
+        frontrollers.spin(forward, 100, percent);
+    } else {
+        frontrollers.stop();
+    }
+    frontRollersRun = !frontRollersRun;
+}
+
+void reverseFrontRollers() {
+    if (!frontRollersRun) {
+        frontrollers.spin(reverse, 100, percent);
+    } else {
+        frontrollers.stop();
+    }
+    frontRollersRun = !frontRollersRun;
+}
+
+void runBackRollers() {
+    if (!backRollersRun) {
+        backrollers.spin(forward, 100, percent);
+    } else {
+        backrollers.stop();
+    }
+    backRollersRun = !backRollersRun;
+}
+
+void reverseBackRollers() {
+    if (!backRollersRun) {
+        backrollers.spin(reverse, 100, percent);
+    } else {
+        backrollers.stop();
+    }
+    backRollersRun = !backRollersRun;
+}
+
+void front() {
+    while (true) {
+        if (control.ButtonL1.pressing()) {
+            frontrollers.spin(forward, 100, percent);
+        }
+        else if (control.ButtonL2.pressing()) {
+            frontrollers.stop();
+        }
+        wait(0.05, seconds);
+    }
+}
+
+// Back button control
+void back() {
+    while (true) {
+        if (control.ButtonR1.pressing()) {
+            backrollers.spin(forward, 100, percent);
+        }
+        else if (control.ButtonR2.pressing()) {
+            backrollers.stop();
+        }
+        wait(0.05, seconds);
+    }
+}
+
+int main() {
+    thread thrd(move);
+    thread thrdd(front);
+    thread thrd2(back);
+
+    control.ButtonA.released(length);
+    control.ButtonL1.released(runFrontRollers);
+    control.ButtonL2.released(reverseFrontRollers);
+    control.ButtonR1.released(reverseBackRollers);
+    control.ButtonR2.released(runBackRollers);
+}
